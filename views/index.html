@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samity Manager</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f5f3;--panel:#fff;--ink:#10201c;--mute:#5d706a;--line:#dce5e1;--brand:#0a6b52;--bi:#fff;--amber:#8f5400;--amberbg:#fdf0d5;--red:#b3261e;--redbg:#fbe3e0;--okbg:#dff2ea;--sh:0 12px 40px rgba(16,32,28,.18)}
+[data-theme=dark]{--bg:#0b1411;--panel:#121d19;--ink:#e6efeb;--mute:#8aa098;--line:#22332d;--brand:#3ecf9f;--bi:#06251b;--amber:#f0b44c;--amberbg:#3a2b0b;--red:#ff8a80;--redbg:#3d1815;--okbg:#12342a;--sh:0 12px 40px rgba(0,0,0,.55)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 'Hind Siliguri',system-ui,sans-serif}
+h1,h2,.fig,.brand{font-family:'Bricolage Grotesque','Hind Siliguri',sans-serif;letter-spacing:-.01em}
+h1{font-size:30px;margin:0}h2{font-size:20px;margin:0 0 10px}
+.mute{color:var(--mute)}a{color:var(--brand)}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;padding:10px 28px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:700;font-size:20px;display:flex;gap:10px;align-items:center}
+.brand i{width:26px;height:26px;border-radius:50% 50% 50% 8px;background:var(--brand)}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav button{border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--okbg);color:var(--brand)}
+main{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+.view{display:none}.view.on{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+.dash{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}.stack{display:flex;flex-direction:column;gap:20px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}.row>div:first-child{flex:1;min-width:170px}
+.sum{list-style:none;margin:0;padding:0}.sum li{display:flex;align-items:baseline;gap:8px;padding:8px 0}
+.sum i{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px)}
+.sum b{font:700 22px 'Bricolage Grotesque',sans-serif}
+.bars{display:flex;align-items:flex-end;gap:10px;height:190px}
+.col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font-size:12.5px}
+.col i{width:100%;max-width:46px;height:0;border-radius:8px 8px 2px 2px;background:var(--brand);animation:grow .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes grow{to{height:var(--h)}}
+.loan{display:grid;grid-template-columns:1.1fr 1.6fr auto;gap:18px;align-items:center;padding:16px 0;border-top:1px solid var(--line)}
+.loan:first-child{border-top:0}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:6px}
+.bar>i{display:block;height:100%;width:0;background:var(--brand);border-radius:inherit;animation:fill .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes fill{to{width:var(--p)}}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--okbg);color:var(--brand)}
+.chip.warn{background:var(--amberbg);color:var(--amber)}.chip.bad{background:var(--redbg);color:var(--red)}.chip.off{background:var(--line);color:var(--mute)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--okbg);color:var(--brand);display:grid;place-items:center;font:700 16px 'Bricolage Grotesque',sans-serif}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:600;padding:8px 16px;border-radius:10px;cursor:pointer;transition:transform .12s,background .2s}
+.btn:hover{background:var(--okbg)}.btn:active{transform:scale(.97)}.btn:disabled{opacity:.5}
+.btn.p{background:var(--brand);color:var(--bi);border-color:var(--brand)}.btn.p:hover{filter:brightness(1.1)}
+.btn.sm{padding:4px 12px;font-size:13.5px}
+.icon{border:1px solid var(--line);background:none;color:var(--ink);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fg3{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}.full{grid-column:1/-1}
+.field label{display:block;font-size:13.5px;font-weight:600;margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:13px;color:var(--mute);font-weight:600}th,td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.n{text-align:right;font-variant-numeric:tabular-nums}
+dialog{border:0;border-radius:20px;padding:0;width:min(640px,calc(100% - 28px));background:var(--panel);color:var(--ink);box-shadow:var(--sh)}
+dialog[open]{animation:pop .2s ease-out}dialog::backdrop{background:rgba(5,15,12,.55);backdrop-filter:blur(2px)}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line)}.mh h2{margin:0}
+.mb{padding:22px;max-height:70vh;overflow:auto}.mb h3{margin:18px 0 6px;font-size:16px}
+.toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:60;max-width:calc(100% - 36px)}
+.toast{background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;box-shadow:var(--sh);border-left:5px solid var(--brand);animation:pop .25s}
+.toast.bad{border-color:var(--red)}.toast a{color:inherit;font-weight:700}
+.sk{color:transparent!important;background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200% 100%;animation:sh 1.2s linear infinite;border-radius:6px}
+@keyframes sh{to{background-position:-200% 0}}
+@media(max-width:820px){.dash,.loan,.fg,.fg3{grid-template-columns:1fr}.top{padding:10px 14px;gap:10px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><i></i>Samity</div>
+  <nav id="nav">
+    <button data-v="dash" class="on">Today</button><button data-v="loans">Loans</button>
+    <button data-v="members">Members</button><button data-v="due">Overdue</button><button data-v="reports">Reports</button>
+  </nav>
+  <button class="icon" id="theme" aria-label="Switch light or dark theme">◐</button>
+  <button class="btn sm" id="logout">Log out</button>
+</header>
+<main>
+  <section class="view on" id="v-dash">
+    <div class="head"><div><h1>Today</h1><p class="mute" id="today"></p></div></div>
+    <div class="dash">
+      <div class="panel"><h2>Installments to collect</h2><p class="mute">Overdue installments, oldest first.</p><div id="collect"></div></div>
+      <div class="stack">
+        <div class="panel"><h2>Ledger summary</h2><ul class="sum">
+          <li><span>Active loans</span><i></i><b class="sk" id="s-active">00</b></li>
+          <li><span>Total lent (Tk)</span><i></i><b class="sk" id="s-disb">0000</b></li>
+          <li><span>Still to receive (Tk)</span><i></i><b class="sk" id="s-out">0000</b></li>
+          <li><span>Overdue (Tk)</span><i></i><b class="sk" id="s-due">000</b></li></ul></div>
+        <div class="panel"><h2>Collected in the last 6 months (Tk)</h2><div class="bars" id="chart"></div></div>
+      </div>
+    </div>
+  </section>
+ 
+  <section class="view" id="v-loans">
+    <div class="head"><div><h1>Loans</h1><p class="mute">See what has been paid and what is still due.</p></div>
+      <button class="btn p" data-act="newloan">New loan</button></div>
+    <div class="panel"><div id="loans"></div></div>
+  </section>
+ 
+  <section class="view" id="v-members">
+    <div class="head"><div><h1>Members</h1><p class="mute">Everyone in the samity.</p></div></div>
+    <div class="panel" style="margin-bottom:20px"><form id="memberForm" class="fg3">
+      <div class="field"><label>Name</label><input name="name" required></div>
+      <div class="field"><label>Phone</label><input name="phone" placeholder="01XXXXXXXXX" required></div>
+      <button class="btn p">Add member</button></form></div>
+    <div class="panel"><div id="members"></div></div>
+  </section>
+ 
+  <section class="view" id="v-due">
+    <div class="head"><div><h1>Overdue</h1><p class="mute">Installments past their due date, up to today.</p></div></div>
+    <div class="panel"><div id="dueTable"></div></div>
+  </section>
+ 
+  <section class="view" id="v-reports">
+    <div class="head"><div><h1>Reports</h1><p class="mute">Monthly collection and the trial balance.</p></div></div>
+    <div class="panel" style="margin-bottom:20px"><div class="fg3" style="grid-template-columns:auto auto auto;justify-content:start">
+      <div class="field"><label>Month</label><input type="month" id="month"></div>
+      <button class="btn p" id="btnMonthly">Show monthly collection</button>
+      <button class="btn" id="btnTb">Show trial balance</button></div></div>
+    <div class="panel" id="out"><p class="mute">Choose a report above.</p></div>
+  </section>
+</main>
+<dialog id="dlg"></dialog>
+<div class="toasts" id="toasts"></div>
+ 
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(n);
+const r2 = x => Math.round(x * 100) / 100;
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+const state = { members: [], loans: [], due: [] };
+const dlg = $('dlg');
+ 
+// ---- Theme ----
+const root = document.documentElement;
+try { root.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (e) {}
+$('theme').onclick = () => {
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+};
+ 
+// ---- Helpers ----
+function toast(msg, type = 'ok', html = false) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.setAttribute('role', 'status');
+  if (html) t.innerHTML = msg; else t.textContent = msg;
+  $('toasts').append(t);
+  setTimeout(() => { t.style.transition = 'opacity .4s'; t.style.opacity = 0; setTimeout(() => t.remove(), 400); }, 5500);
+}
+ 
+async function api(url, method = 'GET', body) {
+  const res = await fetch(url, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401) { location.href = '/login.html'; throw new Error('Please log in'); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Something went wrong');
+  return data;
+}
+ 
+function openModal(title, body) {
+  dlg.innerHTML = `<div class="mh"><h2>${esc(title)}</h2><button class="icon" data-close aria-label="Close">✕</button></div><div class="mb">${body}</div>`;
+  if (!dlg.open) dlg.showModal();
+}
+dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+ 
+function bind(id, fn) {
+  const f = $(id);
+  f.addEventListener('submit', async e => {
+    e.preventDefault();
+    const b = f.querySelector('button.p');
+    b.disabled = true;
+    try { await fn(f); } catch (err) { toast(err.message, 'bad'); } finally { b.disabled = false; }
+  });
+}
+ 
+const chip = (t, k = '') => `<span class="chip ${k}">${t}</span>`;
+function table(h, rows, empty) {
+  if (!rows.length) return `<p class="mute">${empty}</p>`;
+  const num = i => h[i][0] === '>';
+  return `<div class="tw"><table><tr>${h.map((x, i) => `<th${num(i) ? ' class="n"' : ''}>${num(i) ? x.slice(1) : x}</th>`).join('')}</tr>` +
+    rows.map(r => `<tr>${r.map((c, i) => `<td${num(i) ? ' class="n"' : ''}>${c}</td>`).join('')}</tr>`).join('') + '</table></div>';
+}
+ 
+function count(el, to) {
+  el.classList.remove('sk');
+  const t0 = performance.now();
+  (function f(t) {
+    const p = Math.min((t - t0) / 900, 1);
+    el.textContent = p < 1 ? fmt(Math.round(to * (1 - Math.pow(1 - p, 3)))) : fmt(to);
+    if (p < 1) requestAnimationFrame(f);
+  })(t0);
+}
+ 
+// ---- Rendering ----
+function renderDash() {
+  const act = state.loans.filter(l => l.status === 'ACTIVE');
+  count($('s-active'), act.length);
+  count($('s-disb'), r2(state.loans.reduce((s, l) => s + l.principal, 0)));
+  count($('s-out'), r2(act.reduce((s, l) => s + l.remaining, 0)));
+  count($('s-due'), r2(state.due.reduce((s, r) => s + r.due_amount, 0)));
+ 
+  const top = state.due.slice(0, 6);
+  $('collect').innerHTML = top.length
+    ? top.map(r => `<div class="row"><div><b>${esc(r.name)}</b><div class="mute">Loan #${r.loan_id}, installment ${r.seq}, due ${r.due_date}</div></div>
+        ${chip(r.days_late + ' days late', r.days_late > 14 ? 'bad' : 'warn')}
+        <b class="fig">Tk ${fmt(r.due_amount)}</b>
+        <button class="btn sm p" data-act="pay" data-id="${r.loan_id}">Collect</button></div>`).join('') +
+      (state.due.length > 6 ? `<p class="mute">${state.due.length - 6} more are listed under Overdue.</p>` : '')
+    : '<p class="mute">Nothing is overdue today.</p>';
+}
+ 
+function renderLoans() {
+  $('loans').innerHTML = state.loans.length ? state.loans.map(l => {
+    const p = l.total ? Math.min(100, l.paid / l.total * 100) : 0;
+    return `<div class="loan">
+      <div><b>${esc(l.name)}</b><div class="mute">Loan #${l.id} ${l.status === 'ACTIVE' ? chip('Active') : chip('Closed', 'off')}</div></div>
+      <div><div class="bar"><i style="--p:${p.toFixed(1)}%"></i></div>
+        <div class="mute">Paid ${fmt(l.paid)} of ${fmt(l.total)}, ${fmt(l.remaining)} left ${l.fine_due > 0 ? chip('Fine ' + fmt(l.fine_due), 'warn') : ''}</div></div>
+      <div class="acts">
+        ${l.status === 'ACTIVE' ? `<button class="btn sm p" data-act="pay" data-id="${l.id}">Collect</button>` : ''}
+        ${l.fine_due > 0 ? `<button class="btn sm" data-act="fine" data-id="${l.id}">Collect fine</button>` : ''}
+        <button class="btn sm" data-act="sched" data-id="${l.id}">Schedule</button></div></div>`;
+  }).join('') : '<p class="mute">No loans yet. Create the first loan to see it here.</p>';
+}
+ 
+function renderMembers() {
+  $('members').innerHTML = state.members.length ? state.members.map(m =>
+    `<div class="row"><span class="av">${esc([...m.name][0] || '?').toUpperCase()}</span>
+      <div><b>${esc(m.name)}</b><div class="mute">${esc(m.phone)}, joined ${m.joined_at}</div></div>
+      <button class="btn sm" data-act="stmt" data-id="${m.id}">Statement</button></div>`).join('')
+    : '<p class="mute">No members yet. Add the first member above.</p>';
+}
+ 
+function renderDue() {
+  $('dueTable').innerHTML = table(['Member', 'Phone', 'Loan', 'Installment', 'Due date', '>Due (Tk)', 'Late', ''],
+    state.due.map(r => [esc(r.name), esc(r.phone), '#' + r.loan_id, r.seq, r.due_date, fmt(r.due_amount),
+      chip(r.days_late + ' days', r.days_late > 14 ? 'bad' : 'warn'),
+      `<button class="btn sm p" data-act="pay" data-id="${r.loan_id}">Collect</button>`]),
+    'Nothing is overdue today.');
+}
+ 
+async function loadChart() {
+  const now = new Date(), months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+  }
+  const data = await Promise.all(months.map(m => api('/api/reports/monthly?month=' + m)));
+  const vals = data.map(d => d.totals.total_cash), max = Math.max(...vals, 1);
+  $('chart').innerHTML = months.map((m, i) =>
+    `<div class="col"><span>${fmt(vals[i])}</span><i style="--h:${(vals[i] / max * 72).toFixed(1)}%"></i><b>${MON[+m.slice(5) - 1]}</b></div>`).join('');
+}
+ 
+async function load() {
+  const [members, loans, due] = await Promise.all([api('/api/members'), api('/api/loans'), api('/api/overdue')]);
+  Object.assign(state, { members, loans, due });
+  renderDash(); renderLoans(); renderMembers(); renderDue();
+  loadChart().catch(() => {});
+}
+ 
+// ---- Dialogs ----
+function openLoanForm() {
+  if (!state.members.length) { toast('Add a member before creating a loan.', 'bad'); show('members'); return; }
+  openModal('New loan', `<form id="loanForm" class="fg">
+    <div class="field full"><label>Member</label><select name="memberId">${state.members.map(m => `<option value="${m.id}">${esc(m.name)} (${esc(m.phone)})</option>`).join('')}</select></div>
+    <div class="field"><label>Principal (Tk)</label><input name="principal" type="number" min="1" step="0.01" required></div>
+    <div class="field"><label>Interest (%)</label><input name="interestRate" type="number" min="0" step="0.01" value="10" required></div>
+    <div class="field"><label>Number of installments</label><input name="installments" type="number" min="1" step="1" value="10" required></div>
+    <div class="field"><label>Frequency</label><select name="frequency"><option>WEEKLY</option><option>MONTHLY</option></select></div>
+    <div class="field full"><label>Start date</label><input name="startDate" type="date" value="${today()}" required></div>
+    <div class="full"><button class="btn p">Create loan</button></div></form>`);
+  bind('loanForm', async f => {
+    const r = await api('/api/loans', 'POST', {
+      memberId: f.memberId.value, principal: f.principal.value, interestRate: f.interestRate.value,
+      installments: f.installments.value, frequency: f.frequency.value, startDate: f.startDate.value });
+    dlg.close(); toast('Loan #' + r.id + ' created'); await load();
+  });
+}
+ 
+async function openPay(id) {
+  const l = state.loans.find(x => x.id == id);
+  if (!l) return;
+  const sch = await api(`/api/loans/${id}/installments`);
+  const next = sch.find(r => r.amount_due - r.amount_paid > 0.005);
+  const sug = next ? r2(next.amount_due - next.amount_paid) : '';
+  openModal('Collect installment', `<p><b>${esc(l.name)}</b>, loan #${l.id}. Still to receive: Tk ${fmt(l.remaining)}.</p>
+    <form id="payForm"><div class="field"><label>Amount (Tk)</label><input name="amount" type="number" min="0.01" step="0.01" value="${sug}" required></div>
+    <p class="mute">The amount is filled with the next unpaid installment. Change it for a partial or larger payment.</p>
+    <button class="btn p">Collect payment</button></form>`);
+  bind('payForm', async f => {
+    const r = await api('/api/payments', 'POST', { loanId: id, amount: f.amount.value });
+    dlg.close();
+    toast(`Tk ${fmt(r.paid)} collected. <a href="/api/receipt/${r.txId}" target="_blank">Open receipt</a>`, 'ok', true);
+    await load();
+  });
+}
+ 
+async function openFine(id) {
+  const l = state.loans.find(x => x.id == id);
+  if (!l) return;
+  openModal('Collect fine', `<p><b>${esc(l.name)}</b>, loan #${l.id}. Fine due: Tk ${fmt(l.fine_due)}.</p>
+    <form id="fineForm"><div class="field"><label>Amount (Tk)</label><input name="amount" type="number" min="0.01" step="0.01" value="${l.fine_due}" required></div>
+    <button class="btn p" style="margin-top:14px">Collect fine</button></form>`);
+  bind('fineForm', async f => {
+    const r = await api('/api/fines/pay', 'POST', { loanId: id, amount: f.amount.value });
+    dlg.close();
+    toast(`Fine Tk ${fmt(r.paid)} collected. <a href="/api/receipt/${r.txId}" target="_blank">Open receipt</a>`, 'ok', true);
+    await load();
+  });
+}
+ 
+async function openSched(id) {
+  const rows = await api(`/api/loans/${id}/installments`);
+  openModal('Loan #' + id + ' schedule', table(['#', 'Due date', '>Due', '>Paid', 'Status'],
+    rows.map(r => {
+      const left = r2(r.amount_due - r.amount_paid);
+      return [r.seq, r.due_date, fmt(r.amount_due), fmt(r.amount_paid),
+        left <= 0 ? chip('Paid') : r.amount_paid > 0 ? chip('Partly paid', 'warn') : chip('Unpaid', 'off')];
+    }), 'No installments.'));
+}
+ 
+async function openStatement(id) {
+  const r = await api(`/api/members/${id}/statement`);
+  openModal(r.member.name, `<p class="mute">${esc(r.member.phone)}, joined ${r.member.joined_at}</p><h3>Loans</h3>` +
+    table(['Loan', 'Status', '>Total', '>Paid', '>Remaining'],
+      r.loans.map(l => ['#' + l.id, l.status === 'ACTIVE' ? chip('Active') : chip('Closed', 'off'), fmt(l.total), fmt(l.paid), fmt(l.remaining)]), 'No loans yet.') +
+    '<h3>Payments</h3>' + table(['Date', 'Loan', 'Description', '>Amount (Tk)'],
+      r.payments.map(p => [p.date, '#' + p.loan_id, esc(p.description), fmt(p.amount)]), 'No payments yet.'));
+}
+ 
+// ---- Navigation and actions ----
+function show(v) {
+  document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+}
+$('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(b.dataset.v); });
+ 
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const fn = { pay: openPay, fine: openFine, sched: openSched, stmt: openStatement, newloan: openLoanForm }[b.dataset.act];
+  Promise.resolve(fn && fn(b.dataset.id)).catch(err => toast(err.message, 'bad'));
+});
+ 
+bind('memberForm', async f => {
+  await api('/api/members', 'POST', { name: f.name.value, phone: f.phone.value });
+  f.reset(); toast('Member added'); await load();
+});
+ 
+$('btnMonthly').onclick = async () => {
+  try {
+    const m = $('month').value;
+    if (!m) throw new Error('Choose a month first.');
+    const r = await api('/api/reports/monthly?month=' + m), t = r.totals;
+    $('out').innerHTML = `<h2>${MON[+m.slice(5) - 1]} ${m.slice(0, 4)}</h2>
+      <p>Collected <b>Tk ${fmt(t.total_cash)}</b>: principal ${fmt(t.principal)}, interest ${fmt(t.interest)}, fines ${fmt(t.fines)}.</p>` +
+      table(['Member', 'Phone', '>Collected (Tk)'], r.byMember.map(x => [esc(x.name), esc(x.phone), fmt(x.collected)]), 'No collections this month.');
+  } catch (err) { toast(err.message, 'bad'); }
+};
+ 
+$('btnTb').onclick = async () => {
+  try {
+    const r = await api('/api/reports/trial-balance');
+    const rows = r.rows.map(a => [esc(a.name), a.type, fmt(a.debit), fmt(a.credit)]);
+    rows.push(['<b>Total</b>', '', `<b>${fmt(r.totals.debit)}</b>`, `<b>${fmt(r.totals.credit)}</b>`]);
+    $('out').innerHTML = '<h2>Trial balance</h2>' + table(['Account', 'Type', '>Debit', '>Credit'], rows, '') +
+      `<p>${r.balanced ? chip('Balanced') + ' Total debit equals total credit.' : chip('Not balanced', 'bad') + ' Check the ledger.'}</p>`;
+  } catch (err) { toast(err.message, 'bad'); }
+};
+ 
+$('logout').onclick = async () => {
+  try { await api('/api/logout', 'POST', {}); } catch (e) {}
+  location.href = '/login.html';
+};
+ 
+// ---- Start ----
+$('today').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Dhaka' });
+$('month').value = today().slice(0, 7);
+load().catch(err => toast(err.message, 'bad'));
+</script>
+</body>
+</html>
